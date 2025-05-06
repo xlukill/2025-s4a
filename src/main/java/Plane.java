@@ -1,22 +1,21 @@
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.TreeSet;
 
 public class Plane {
     int id;
     int maxCapacity;
     int occupiedSeats;
-    int assignedRoute;
+    Route assignedRoute;
+    long placeAvailability;
 
-    public HashMap<String, String> getMap() {
+    public LinkedHashMap<String, String> getMap() {
         return map;
     }
 
-    public void setMap(HashMap<String, String> map) {
-        this.map = map;
-    }
+    LinkedHashMap<String, String> map = new LinkedHashMap<>();
 
-    HashMap<String, String> map = new HashMap<>();
-
-    public Plane(int id, int maxCapacity, int occupiedSeats, int assignedRoute) {
+    public Plane(int id, int maxCapacity, int occupiedSeats, Route assignedRoute) {
         this.id = id;
         this.maxCapacity = maxCapacity;
         this.occupiedSeats = occupiedSeats;
@@ -24,41 +23,9 @@ public class Plane {
         for (long i = 0; i < 1000; i++) {
             map.put(String.valueOf(i), String.valueOf(maxCapacity));
         }
-    }
-
-    public Plane() {
-
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getMaxCapacity() {
-        return maxCapacity;
-    }
-
-    public void setMaxCapacity(int maxCapacity) {
-        this.maxCapacity = maxCapacity;
-    }
-
-    public int getOccupiedSeats() {
-        return occupiedSeats;
-    }
-
-    public void setOccupiedSeats(int occupiedSeats) {
-        this.occupiedSeats = occupiedSeats;
-    }
-
-    public int getAssignedRoute() {
-        return assignedRoute;
-    }
-
-    public void setAssignedRoute(int assignedRoute) {
-        this.assignedRoute = assignedRoute;
+        placeAvailability = -1;
     }
 }
+
+
+

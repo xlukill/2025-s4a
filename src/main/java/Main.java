@@ -1,9 +1,6 @@
 import utils.UserUtils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static utils.UserUtils.*;
 
@@ -34,10 +31,16 @@ public class Main {
     }
 
     public static String S4A_Airlines(long[] QR, long[] maxPassangers, List<String> queries) {
+        int maxRoute = (int) QR[0];
         StringBuilder builder = new StringBuilder();
         Map<Integer, Plane> planes = new LinkedHashMap();
-        for (int i = 0; i < QR[0]; i++) {
-            planes.put(i + 1, new Plane(i + 1, Integer.parseInt(String.valueOf(maxPassangers[i])), 0, i + 1));
+        Map<Integer, Route> routes = new LinkedHashMap();
+        Map<Integer,Integer> linked = new LinkedHashMap<>();
+        for (int i = 1; i <= QR[0]; i++) {
+            Route route = new Route(i);
+            routes.put(i,route);
+            planes.put(i, new Plane(i, Integer.parseInt(String.valueOf(maxPassangers[i-1])), 0,route));
+            linked.put(i,i);
         }
         for (String n : queries) {
             int sum = 0;
@@ -54,8 +57,13 @@ public class Main {
                 ---
                  */
                 case "P":
-                case "A":
                     planes.get(stringToInt(query[1])).map.put(query[3], query[2]);
+                    break;
+                case "A":
+                    maxRoute++;
+//                    routes.put(maxRoute, new Route(maxRoute));
+                    planes.get(stringToInt(query[1])).map.put(query[3], query[2]);
+                    linked.put(Integer.valueOf(query[1]),maxRoute);
                     break;
                 /*
                 eg. QUERY - C 2 3
@@ -72,17 +80,17 @@ public class Main {
                     String t = query[3];
                     int indexFrom = stringToInt(query[1]);
                     int indexTo = stringToInt(query[2]);
-                    Map<Integer, Plane> subMapPlane = createSubMap(planes, indexFrom, indexTo);
+                    Map<Integer,Integer> subMapLinked = createSubMap(linked,indexFrom,indexTo);
 
                     int actualT = Integer.parseInt(t);
                     for (int i = 0; i < actualT; i++) {
-                        for (Map.Entry<Integer, Plane> entry : subMapPlane.entrySet()) {
-//                          Integer k = entry.getKey();
-                            Plane p = entry.getValue();
-                            if (!p.getMap().containsKey(String.valueOf(actualT - 1))) {
+                        for (Map.Entry<Integer, Integer> entry : subMapLinked.entrySet()) {
+                            int planeIndex = entry.getKey();
+                            Plane plane = planes.get(planeIndex);
+                            if (!plane.getMap().containsKey(String.valueOf(actualT-1))) {
                                 continue;
                             }
-                            String value = p.getMap().get(String.valueOf(i));
+                            String value = plane.getMap().get(String.valueOf(i));
                             if (value != null) {
                                 sum += Integer.parseInt(value);
                             }
@@ -93,21 +101,20 @@ public class Main {
         }
         return builder.toString();
     }
-
-    public static Map<Integer, Plane> createSubMap(Map<Integer, Plane> originalMap, int startKey, int endKey) {
-        Map<Integer, Plane> subMap = new LinkedHashMap<>();
+    public static Map<Integer, Integer> createSubMap(Map<Integer, Integer> originalMap, int startKey, int endKey) {
+        Map<Integer, Integer> subMap = new LinkedHashMap<>();
         boolean inRange = false;
 
-        for (Map.Entry<Integer, Plane> entry : originalMap.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : originalMap.entrySet()) {
             //start check
-            if (entry.getKey().equals(startKey)) {
+            if (entry.getValue().equals(startKey)) {
                 inRange = true;
             }
             if (inRange) {
                 subMap.put(entry.getKey(), entry.getValue());
             }
             //end check
-            if (entry.getKey().equals(endKey)) {
+            if (entry.getValue().equals(endKey)) {
                 break;
             }
         }
